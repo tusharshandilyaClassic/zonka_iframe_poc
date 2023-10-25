@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+
+  <style>
+    body {
+      font-family: "Courier New", Courier, monospace;
+    }
+
+    h1 {
+      position: relative;
+    }
+    h1::after {
+      content: "";
+      position: absolute;
+      height: 2px;
+      width: 100%;
+      bottom: 5px;
+      left: 0;
+      background-color: red;
+      z-index: -1;
+    }
+  </style>
+  <body>
+    <h1>Independent doc with custom styling</h1>
+
+    <h2 id="question">This is a question</h2>
+    <ul id="options">
+      <li id="option-1">Option 1</li>
+      <li id="option-2">Option 2</li>
+      <li id="option-3">
+        <h3>Option 3</h3>
+      </li>
+      <li id="option-4">Option 4</li>
+    </ul>
+  </body>
+</html>
