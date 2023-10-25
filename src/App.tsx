@@ -12,26 +12,6 @@ function App() {
     }
   };
 
-  const updateFrameValues = (
-    frame: HTMLIFrameElement,
-    values: EditorFormValues
-  ) => {
-    Object.entries(values).forEach(([id, value]) => {
-      const innerDoc = getFrameDocument(frame);
-      const elem = innerDoc?.getElementById(id);
-
-      if (elem) {
-        elem.innerHTML = value;
-      }
-    });
-  };
-
-  const getFrameDocument = (frame: HTMLIFrameElement) => {
-    return frame.contentDocument
-      ? frame.contentDocument
-      : frame.contentWindow?.document;
-  };
-
   const refreshFrame = () => {
     if (iframeRef.current) {
       setIframeLoaded(false); // causes side effect - Editor reloads; TODO: find a cleaner/more predictable way to update "preview" iframe state
@@ -74,3 +54,25 @@ function App() {
 }
 
 export default App;
+
+// UTILS
+
+const updateFrameValues = (
+  frame: HTMLIFrameElement,
+  values: EditorFormValues,
+) => {
+  Object.entries(values).forEach(([id, value]) => {
+    const innerDoc = getFrameDocument(frame);
+    const elem = innerDoc?.getElementById(id);
+
+    if (elem) {
+      elem.innerHTML = value;
+    }
+  });
+};
+
+const getFrameDocument = (frame: HTMLIFrameElement) => {
+  return frame.contentDocument
+    ? frame.contentDocument
+    : frame.contentWindow?.document;
+};
