@@ -1,8 +1,31 @@
 import { useRef, useState } from "react";
 import Editor, { EditorFormValues } from "./components/Editor";
+import ErrorBoundary from "./components/ErrorBoundary";
+import Error from "./components/Error";
+import Button from "./components/Button";
+
+const DOC_SRCS = {
+  publicDir: {
+    id: "publicDir",
+    label: "Public Dir (same origin)",
+    src: "/_data/preview.html",
+  },
+  mockServer: {
+    id: "mockServer",
+    label: "Mock Server",
+    src: "http://localhost:8000",
+  },
+  zonka: {
+    id: "zonka",
+    label: "Zonka (survey preview)",
+    src: "https://us1.zonka.co/preview/hnU4P3",
+  },
+};
 
 function App() {
   const [iframeLoaded, setIframeLoaded] = useState(false);
+  const [renderDoc, setRenderDoc] =
+    useState<keyof typeof DOC_SRCS>("publicDir");
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const handleEditorChange = (values: EditorFormValues) => {
@@ -19,37 +42,63 @@ function App() {
     }
   };
 
+  const handleSelectChange = (evt: React.ChangeEvent<HTMLSelectElement>) => {
+    setIframeLoaded(false);
+    setRenderDoc(evt.target.value as keyof typeof DOC_SRCS);
+  };
+
+  const currentDoc = DOC_SRCS[renderDoc];
+  const showWarning = renderDoc !== "publicDir";
+
   return (
-    <div className="flex w-screen p-4 gap-2">
-      <div className="h-full">
-        <div className="shadow-md rounded-md mb-4 p-2 flex flex-col">
-          {iframeLoaded ? (
-            <span className="text-green-600">Frame loaded</span>
-          ) : (
-            <span className="text-amber-600">Loading</span>
-          )}
-          <button
-            disabled={!iframeLoaded}
-            onClick={refreshFrame}
-            className="border border-blue-500 bg-blue-500 text-white rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-blue-600 focus:outline-none focus:shadow-outline disabled:opacity-50 disabled:pointer-events-none"
-          >
-            Refresh iframe
-          </button>
+    <ErrorBoundary fallback={(error) => <Error>{error}</Error>}>
+      <div className="flex w-screen p-4 gap-2">
+        <div className="h-full basis-80 flex-grow-0">
+          <div className="shadow-md rounded-md mb-4 p-2 flex flex-col">
+            {iframeLoaded ? (
+              <span className="text-green-600">Frame loaded</span>
+            ) : (
+              <span className="text-amber-600">Loading</span>
+            )}
+            <Button disabled={!iframeLoaded} onClick={refreshFrame}>
+              Refresh iframe
+            </Button>
+
+            <select
+              name="docSrc"
+              onChange={handleSelectChange}
+              className="border-2 border-gray-300 bg-white rounded-md px-2 py-1"
+            >
+              {Object.values(DOC_SRCS).map((option) => (
+                <option value={option.id} key={option.src}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+
+            {showWarning && (
+              <h1 className="text-amber-600 my-2 font-semibold  text-justify">
+                ⚠️ Changing data on non-same origin iframe will crash the page.
+                (You can refresh it to bring it back)
+              </h1>
+            )}
+          </div>
+
+          <Editor onValueChange={handleEditorChange} />
         </div>
 
-        <Editor onValueChange={handleEditorChange} />
+        {/* Preview frame */}
+        <div className="shadow-md flex-1 rounded-md">
+          {!iframeLoaded && <span className="text-amber-600">Loading</span>}
+          <iframe
+            ref={iframeRef}
+            onLoad={() => setIframeLoaded(true)}
+            src={currentDoc.src}
+            className="h-full w-full"
+          ></iframe>
+        </div>
       </div>
-
-      {/* Preview frame */}
-      <div className="shadow-md flex-1 rounded-md">
-        <iframe
-          ref={iframeRef}
-          onLoad={() => setIframeLoaded(true)}
-          src="/_data/preview.html"
-          className="h-full w-full"
-        ></iframe>
-      </div>
-    </div>
+    </ErrorBoundary>
   );
 }
 
@@ -59,7 +108,7 @@ export default App;
 
 const updateFrameValues = (
   frame: HTMLIFrameElement,
-  values: EditorFormValues,
+  values: EditorFormValues
 ) => {
   Object.entries(values).forEach(([id, value]) => {
     const innerDoc = getFrameDocument(frame);
