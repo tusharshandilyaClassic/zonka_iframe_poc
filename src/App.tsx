@@ -1,26 +1,9 @@
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import Editor, { EditorFormValues } from "./components/Editor";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Error from "./components/Error";
 import Button from "./components/Button";
-
-const DOC_SRCS = {
-  publicDir: {
-    id: "publicDir",
-    label: "Public Dir (same origin)",
-    src: "/_data/preview.html",
-  },
-  mockServer: {
-    id: "mockServer",
-    label: "Mock Server",
-    src: "http://localhost:8000",
-  },
-  zonka: {
-    id: "zonka",
-    label: "Zonka (survey preview)",
-    src: "https://us1.zonka.co/preview/hnU4P3",
-  },
-};
+import { DOC_SRCS } from "./config/app.config";
 
 function App() {
   const [iframeLoaded, setIframeLoaded] = useState(false);
@@ -28,12 +11,15 @@ function App() {
     useState<keyof typeof DOC_SRCS>("publicDir");
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  const handleEditorChange = (values: EditorFormValues) => {
-    const frame = iframeRef.current;
-    if (iframeLoaded && frame) {
-      updateFrameValues(frame, values);
-    }
-  };
+  const handleEditorChange = useCallback(
+    (values: EditorFormValues) => {
+      const frame = iframeRef.current;
+      if (iframeLoaded && frame) {
+        updateFrameValues(frame, values);
+      }
+    },
+    [iframeRef.current]
+  );
 
   const refreshFrame = () => {
     if (iframeRef.current) {
@@ -95,7 +81,7 @@ function App() {
             onLoad={() => setIframeLoaded(true)}
             src={currentDoc.src}
             className="h-full w-full"
-          ></iframe>
+          />
         </div>
       </div>
     </ErrorBoundary>
