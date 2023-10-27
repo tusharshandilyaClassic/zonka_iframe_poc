@@ -3,7 +3,7 @@
   "setupTasks": [
     {
       "name": "Install Dependencies",
-      "command": "yarn install"
+      "command": "yarn install:all"
     }
   ],
 
@@ -11,23 +11,24 @@
   "tasks": {
     "dev": {
       "name": "dev",
-      "command": "yarn dev",
+      "command": "yarn watch:all",
       "runAtStart": true
     },
     "build": {
       "name": "build",
-      "command": "yarn build",
-      "runAtStart": false
+      "command": "yarn build"
     },
     "lint": {
       "name": "lint",
-      "command": "yarn lint",
-      "runAtStart": false
+      "command": "yarn lint"
     },
     "preview": {
       "name": "preview",
-      "command": "yarn preview",
-      "runAtStart": false
+      "command": "yarn preview"
+    },
+    "CSB_RUN_OUTSIDE_CONTAINER=1 devcontainer templates apply --template-id \"ghcr.io/devcontainers/templates/typescript-node\" --template-args '{}' --features '[]'": {
+      "name": "Environment setup",
+      "command": "CSB_RUN_OUTSIDE_CONTAINER=1 devcontainer templates apply --template-id \"ghcr.io/devcontainers/templates/typescript-node\" --template-args '{}' --features '[]'"
     }
   }
 }
