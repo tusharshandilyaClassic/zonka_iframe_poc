@@ -46,7 +46,11 @@ function App() {
             ) : (
               <span className="text-amber-600">Loading</span>
             )}
-            <Button disabled={!iframeLoaded} onClick={refreshFrame}>
+            <Button
+              variant="secondary"
+              disabled={!iframeLoaded}
+              onClick={refreshFrame}
+            >
               Refresh iframe
             </Button>
 
